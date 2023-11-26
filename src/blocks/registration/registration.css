@@ -1,0 +1,10 @@
+.registration {
+  margin: 60px auto 0 auto;
+  max-width: 358px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  color: white;
+}

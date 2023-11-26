@@ -1,0 +1,12 @@
+.header__condition {
+  max-width: 56px;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  cursor: pointer;
+}
+
+.header__condition:hover {
+  opacity: .6;
+}
