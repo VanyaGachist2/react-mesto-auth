@@ -1,5 +1,6 @@
 .header__log {
   display: flex;
+  align-items: center;
   margin: 0;
   gap: 24px;
 }
