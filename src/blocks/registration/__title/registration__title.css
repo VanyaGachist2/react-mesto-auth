@@ -6,3 +6,9 @@
   line-height: normal;
   margin: 0;
 }
+
+@media screen and (max-width: 599px) {
+  .registration__title {
+    font-size: 20px;
+  }
+}

@@ -7,3 +7,9 @@
   text-align: center;
   color: white;
 }
+
+@media screen and (max-width: 599px) {
+  .registration {
+    max-width: 260px;
+  }
+}
