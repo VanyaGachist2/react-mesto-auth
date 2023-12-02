@@ -1,3 +1,6 @@
+import complete from '../images/yes.svg';
+import error from '../images/no.svg';
+
 import Header from "./Header.jsx";
 import Main from "./Main.jsx";
 import Footer from "./Footer.jsx";
@@ -9,6 +12,12 @@ import CurrentUserContext from "../contexts/CurrentUserContext.js";
 import EditProfilePopup from './EditProfilePopup.jsx';
 import EditAvatarPopup from "./EditAvatarPopup.jsx";
 import AddCardPopup from "./AddCardPopup.jsx";
+import { Route, Routes, useNavigate } from "react-router";
+import ProtectedRoute from "./ProtectedRoute.jsx";
+import Login from "./Login.jsx";
+import Register from "./Register.jsx";
+import { authApi } from "../utils/Auth.js";
+import InfoTooltip from './InfoTooltip.jsx';
 
 function App() {
 
@@ -16,8 +25,70 @@ function App() {
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false);
   const [userData, setUserData] = useState({})
+  const [userMail, setUserMail] = useState('');
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const [avatarStatusRegisterPopup, setAvatarStatusRegisterPopup] = useState(null);
+  const [statusRegisterPopup, setStatusRegisterPopup] = useState(false);
+  const [textStatusRegisterPopup, setTextStatusRegisterPopup] = useState('');
+
+  const navigate = useNavigate();
+
+  const handleRegistration = (email, password) => {
+    authApi.registration(email, password)
+      .then(() => {
+        setStatusRegisterPopup(true);
+        setTextStatusRegisterPopup('Вы успешно зарегистрировались!');
+        setAvatarStatusRegisterPopup(complete);
+        navigate("/sign-in", {replace: true});
+      })
+      .catch((err) => {
+        setStatusRegisterPopup(true);
+        setTextStatusRegisterPopup('Что-то пошло не так! Попробуйте ещё раз.');
+        setAvatarStatusRegisterPopup(error);
+        console.log(err);
+      })
+  }
+
+  const handleLogin = (email, password) => {
+    authApi.Login(email, password)
+      .then((res) => {
+        if(res) {
+          localStorage.setItem('jwt', res.token);
+          setLoggedIn(true);
+          navigate("/", {replace: true});
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
+
+  const handleCheckToken = () => {
+    if (localStorage.getItem('jwt')) {
+      const jwt = localStorage.getItem('jwt');
+      authApi.checkToken(jwt)
+        .then((res) => {
+          if(res) {
+            setUserMail(res.data.email);
+            setLoggedIn(true)
+            navigate('/', {replace: true});
+          }
+        })
+    }
+  }
+
+  useEffect(() => {
+    handleCheckToken();
+  }, []);
+
+
+  const handleExit = () => {
+    localStorage.removeItem('jwt');
+    navigate('/sign-in', {replace: true});
+  }
 
   useEffect(() => {
     api.getInfo()
@@ -57,6 +128,7 @@ function App() {
     setIsAvatarPopupOpen(false);
     setIsEditPopupOpen(false);
     setSelectedCard(null);
+    setStatusRegisterPopup(false);
   }
 
 
@@ -126,17 +198,33 @@ function App() {
           card={selectedCard}
           isClose={closeAllPopups}
         />
-        <Header />
-        <Main
-          avatarPopup={handleOpenAvatarPopup}
-          editPopup={handleOpenEditPopup}
-          addPopup={handleOpenAddPopup}
-          cards={cards}
-          userData={userData}
-          imagePopup={handleOpenFullImageCard}
-          onDelete={handleCardDelete}
-          onLike={handleCardLike}
-        />
+        <InfoTooltip
+          isOpen={statusRegisterPopup}
+          onClose={closeAllPopups}
+          logo={avatarStatusRegisterPopup}
+          name={textStatusRegisterPopup}
+       />
+        <Header mail={userMail} exit={handleExit} />
+        <>
+          <Routes>
+            <Route path="/" element={
+              <ProtectedRoute
+                loggedIn={loggedIn}
+                element={Main}
+                avatarPopup={handleOpenAvatarPopup}
+                editPopup={handleOpenEditPopup}
+                addPopup={handleOpenAddPopup}
+                cards={cards}
+                userData={userData}
+                imagePopup={handleOpenFullImageCard}
+                onDelete={handleCardDelete}
+                onLike={handleCardLike}
+              />
+            } />
+            <Route path="/sign-in" element={<Login handleLogin={handleLogin} />} />
+            <Route path="/sign-up" element={<Register handleRegister={handleRegistration} />} />
+          </Routes>
+        </>
         <Footer />
       </CurrentUserContext.Provider>
     </div>
