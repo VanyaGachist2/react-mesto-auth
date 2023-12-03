@@ -57,6 +57,7 @@ function App() {
       .then((res) => {
         if(res) {
           localStorage.setItem('jwt', res.token);
+          setUserMail(email);
           setLoggedIn(true);
           navigate("/", {replace: true});
         }
@@ -87,11 +88,13 @@ function App() {
 
   const handleExit = () => {
     localStorage.removeItem('jwt');
+    setUserMail('');
     navigate('/sign-in', {replace: true});
   }
 
   useEffect(() => {
-    api.getInfo()
+    if(loggedIn) {
+      api.getInfo()
       .then((data) => {
         setUserData(data)
       })
@@ -105,7 +108,8 @@ function App() {
       .catch((err) => {
         console.log(err)
       })
-  }, [])
+    }
+  }, [loggedIn])
 
   const handleOpenEditPopup = () => {
     setIsEditPopupOpen(true);
