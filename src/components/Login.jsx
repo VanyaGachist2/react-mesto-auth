@@ -1,6 +1,6 @@
 const { useState } = require("react");
 
-function Login({ handleLogin }) {
+function Login({ handleLogin, statusText }) {
 
   const [formValue, setFormValue] = useState({
     email: '',
@@ -44,7 +44,7 @@ function Login({ handleLogin }) {
             value={formValue.password}
             required
             />
-          <button className='registration__button' type='submit'>Войти</button>
+          <button className='registration__button' type='submit'>{statusText ? 'Вход...' : 'Войти'}</button>
         </form>
       </section>
   )

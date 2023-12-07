@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 
-function Register({ handleRegister }) {
+function Register({ handleRegister, statusText }) {
 
   const [formValue, setFormValue] = useState({
     email: '',
@@ -46,7 +46,7 @@ function Register({ handleRegister }) {
             onChange={handleChange}
             required
             />
-          <button className='registration__button' type='submit'>Зарегистрироваться</button>
+          <button className='registration__button' type='submit'>{statusText ? 'Регистрация' : 'Зарегистрироваться'}</button>
         </form>
         <p className="registration__subtitle">Уже зарегистрированы? <Link className="registration__subtitle_color_white" to="/sign-in">Войти</Link></p>
     </section>
