@@ -18,25 +18,34 @@ import Login from "./Login.jsx";
 import Register from "./Register.jsx";
 import { authApi } from "../utils/Auth.js";
 import InfoTooltip from './InfoTooltip.jsx';
+import DeletePopup from './DeletePopup.jsx';
 
 function App() {
 
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [isAddPopupOpen, setIsAddPopupOpen] = useState(false);
   const [isAvatarPopupOpen, setIsAvatarPopupOpen] = useState(false);
+
   const [userData, setUserData] = useState({})
   const [userMail, setUserMail] = useState('');
+
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+
   const [loggedIn, setLoggedIn] = useState(false);
+
+  const [deletePopup, setDeletePopup] = useState(null);
 
   const [avatarStatusRegisterPopup, setAvatarStatusRegisterPopup] = useState(null);
   const [statusRegisterPopup, setStatusRegisterPopup] = useState(false);
   const [textStatusRegisterPopup, setTextStatusRegisterPopup] = useState('');
 
+  const [statusTextForApi, setStatusTextForApi] = useState(false);
+
   const navigate = useNavigate();
 
   const handleRegistration = (email, password) => {
+    setStatusTextForApi(true);
     authApi.registration(email, password)
       .then(() => {
         setStatusRegisterPopup(true);
@@ -50,9 +59,15 @@ function App() {
         setAvatarStatusRegisterPopup(error);
         console.log(err);
       })
+      .finally(() => {
+        setInterval(() => {
+          setStatusTextForApi(false);
+        }, 1000)
+      });
   }
 
   const handleLogin = (email, password) => {
+    setStatusTextForApi(true);
     authApi.Login(email, password)
       .then((res) => {
         if(res) {
@@ -65,6 +80,11 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
+      .finally(() => {
+        setInterval(() => {
+          setStatusTextForApi(false);
+        }, 800)
+      });
   }
 
   const handleCheckToken = () => {
@@ -127,12 +147,41 @@ function App() {
     setSelectedCard({title, image})
   }, []);
 
+  const handleDeletePopupOpen = (card) => {
+    setDeletePopup(card);
+  }
+
+
+  // Закрытие попапов по клику за область и по нажатию на кнопку escape
+  useEffect(() => {
+    const handleCloseEscape = (evt) => {
+      if(evt.key === 'Escape') {
+        closeAllPopups();
+      }
+    }
+
+    const handleCloseToClick = (evt) => {
+      if(evt.target.classList.contains('popup')) {
+        closeAllPopups();
+      }
+    }
+
+    window.addEventListener('keydown', handleCloseEscape);
+    document.addEventListener('click', handleCloseToClick);
+
+    return () => {
+      window.removeEventListener('keydown', handleCloseEscape);
+      document.removeEventListener('click', handleCloseToClick);
+    }
+  }, [])
+
   function closeAllPopups() {
     setIsAddPopupOpen(false);
     setIsAvatarPopupOpen(false);
     setIsEditPopupOpen(false);
     setSelectedCard(null);
     setStatusRegisterPopup(false);
+    setDeletePopup(null);
   }
 
 
@@ -140,6 +189,7 @@ function App() {
     api.deleteCard(card._id)
       .then(() => {
         setCards(cards => cards.filter((c) => c._id !== card._id));
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(err);
@@ -147,6 +197,7 @@ function App() {
   }
 
   function handleUptadeUserInfo(userData) {
+    setStatusTextForApi(true);
     api.editProfile(userData.name, userData.about)
       .then((newUser) => {
         setUserData(newUser)
@@ -155,9 +206,15 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
+      .finally(() => {
+        setInterval(() => {
+          setStatusTextForApi(false);
+        }, 800)
+      });
   }
 
   function handleUpdateAvatarForPage (data) {
+    setStatusTextForApi(true);
     api.changeAvatar(data)
       .then((d) => {
         setUserData(d);
@@ -166,9 +223,15 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
+      .finally(() => {
+        setInterval(() => {
+          setStatusTextForApi(false);
+        }, 800)
+      });
   }
 
   function handleAddCard (data) {
+    setStatusTextForApi(true);
     api.addCard(data)
      .then((newCards) => {
       setCards((cards) => [newCards, ...cards]);
@@ -177,6 +240,11 @@ function App() {
      .catch((err) => {
       console.log(err);
      })
+     .finally(() => {
+      setInterval(() => {
+        setStatusTextForApi(false);
+      }, 800)
+    });
   }
 
   function  handleCardLike(card) {
@@ -195,9 +263,24 @@ function App() {
   return (
     <div className="page">
       <CurrentUserContext.Provider value={userData}>
-        <EditProfilePopup isOpen={isEditPopupOpen} onClose={closeAllPopups} updateInfo={handleUptadeUserInfo} />
-        <EditAvatarPopup isOpen={isAvatarPopupOpen} onClose={closeAllPopups} updateAvatar={handleUpdateAvatarForPage} />
-        <AddCardPopup isOpen={isAddPopupOpen} onClose={closeAllPopups} addCard={handleAddCard} />
+        <EditProfilePopup
+        isOpen={isEditPopupOpen}
+        onClose={closeAllPopups}
+        updateInfo={handleUptadeUserInfo}
+        statusText={statusTextForApi}
+        />
+        <EditAvatarPopup
+        isOpen={isAvatarPopupOpen}
+        onClose={closeAllPopups}
+        updateAvatar={handleUpdateAvatarForPage}
+        statusText={statusTextForApi}
+        />
+        <AddCardPopup
+        isOpen={isAddPopupOpen}
+        onClose={closeAllPopups}
+        addCard={handleAddCard}
+        statusText={statusTextForApi}
+        />
         <ImagePopup
           card={selectedCard}
           isClose={closeAllPopups}
@@ -207,6 +290,12 @@ function App() {
           onClose={closeAllPopups}
           logo={avatarStatusRegisterPopup}
           name={textStatusRegisterPopup}
+       />
+       <DeletePopup
+        card={deletePopup}
+        deleteCard={handleCardDelete}
+        isOpen={deletePopup}
+        onClose={closeAllPopups}
        />
         <Header mail={userMail} exit={handleExit} />
         <>
@@ -221,12 +310,12 @@ function App() {
                 cards={cards}
                 userData={userData}
                 imagePopup={handleOpenFullImageCard}
-                onDelete={handleCardDelete}
+                onDelete={handleDeletePopupOpen}
                 onLike={handleCardLike}
               />
             } />
-            <Route path="/sign-in" element={<Login handleLogin={handleLogin} />} />
-            <Route path="/sign-up" element={<Register handleRegister={handleRegistration} />} />
+            <Route path="/sign-in" element={<Login handleLogin={handleLogin} statusText={statusTextForApi} />} />
+            <Route path="/sign-up" element={<Register handleRegister={handleRegistration} statusText={statusTextForApi} />} />
           </Routes>
         </>
         <Footer />
