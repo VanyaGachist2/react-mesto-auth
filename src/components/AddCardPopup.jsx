@@ -1,7 +1,7 @@
 import { useState } from "react";
 import PopupWithForm from "./PopupWithForm.jsx";
 
-function AddCardPopup({ isOpen, onClose, addCard }) {
+function AddCardPopup({ isOpen, onClose, addCard, statusText }) {
 
   const [name, setName] = useState('');
   const [link, setLink] = useState('');
@@ -29,7 +29,7 @@ function AddCardPopup({ isOpen, onClose, addCard }) {
           isOpen={isOpen}
           name="add"
           click="save"
-          buttonText="Создать"
+          buttonText={statusText ? 'Создание...' : 'Создать'}
           onClose={onClose}
           onSubmit={handleAddCard}
           >
