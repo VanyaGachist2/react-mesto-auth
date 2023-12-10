@@ -1,6 +1,6 @@
 import PopupWithForm from "./PopupWithForm";
 
-function DeletePopup({ card, deleteCard, isOpen, onClose }) {
+function DeletePopup({ card, deleteCard, isOpen, onClose, statusText }) {
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -14,7 +14,7 @@ function DeletePopup({ card, deleteCard, isOpen, onClose }) {
       isOpen={isOpen}
       name="deletePopup"
       click="delete"
-      buttonText="Да"
+      buttonText={statusText ? 'Удаление...' : 'Да'}
       onClose={onClose}
       onSubmit={handleSubmit}
       children={<></>}

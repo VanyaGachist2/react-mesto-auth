@@ -186,6 +186,7 @@ function App() {
 
 
   function handleCardDelete (card) {
+    setStatusTextForApi(true);
     api.deleteCard(card._id)
       .then(() => {
         setCards(cards => cards.filter((c) => c._id !== card._id));
@@ -193,6 +194,11 @@ function App() {
       })
       .catch((err) => {
         console.log(err);
+      })
+      .finally(() => {
+        setInterval(() => {
+          setStatusTextForApi(false);
+        }, 800)
       })
   }
 
@@ -296,6 +302,7 @@ function App() {
         deleteCard={handleCardDelete}
         isOpen={deletePopup}
         onClose={closeAllPopups}
+        statusText={statusTextForApi}
        />
         <Header mail={userMail} exit={handleExit} />
         <>

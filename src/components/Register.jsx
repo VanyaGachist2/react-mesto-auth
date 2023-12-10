@@ -46,7 +46,7 @@ function Register({ handleRegister, statusText }) {
             onChange={handleChange}
             required
             />
-          <button className='registration__button' type='submit'>{statusText ? 'Регистрация' : 'Зарегистрироваться'}</button>
+          <button className='registration__button' type='submit'>{statusText ? 'Регистрация...' : 'Зарегистрироваться'}</button>
         </form>
         <p className="registration__subtitle">Уже зарегистрированы? <Link className="registration__subtitle_color_white" to="/sign-in">Войти</Link></p>
     </section>
