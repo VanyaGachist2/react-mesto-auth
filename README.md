@@ -15,4 +15,4 @@ React проект "MESTO", со следующими возможностями
 -------
 - клонировать проект `git clone git@github.com:VanyaGachist2/react-mesto-api-full-gha.git`
 - установка зависимостей с помощью `npm i`
-- запустить с помощью `npm i`
+- запустить с помощью `npm run start`
